@@ -19,14 +19,14 @@ struct VMAPAdBreakAttributes {
     static let repeatAfter = "repeatAfter"
 }
 
-public enum VMAPAdBreakType: String {
+public enum VMAPAdBreakType: String, Codable {
     case linear = "linear"
     case nonlinear = "nonlinear"
     case display = "display"
     case unknown = "unknown"
 }
 
-public struct VMAPAdBreak {
+public struct VMAPAdBreak: Codable {
     public var breakId: String?
     public var repeatAfter: String?
     public let breakType: VMAPAdBreakType
@@ -60,20 +60,20 @@ extension VMAPAdBreak {
         self.timeOffset = timeOffset
         self.repeatAfter = repeatAfter
     }
-    
+
     public func trackEvent(withType type: VMAPTrackingEventType) {
         trackingEvents.filter { $0.event == type }
             .forEach { event in
                 guard let url = event.url else { return }
                 print("tracking event of type: \(type), url: \(url.absoluteString)")
-                makeRequest(withUrl: url)
-            }
+                track(url: url)
+        }
     }
-    
+
     public func trackEvents(withUrls urls: [URL]) {
         urls.forEach { url in
             print("tracking event of type: \(VMAPTrackingEventType.breakEnd), url: \(url.absoluteString)")
-            makeRequest(withUrl: url)
+            track(url: url)
         }
     }
 

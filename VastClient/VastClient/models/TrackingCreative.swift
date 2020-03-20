@@ -8,6 +8,10 @@
 
 import Foundation
 
+enum TrackingCreativeError: Error {
+    case noDurationInVastLinearCreative
+}
+
 struct TrackingCreative {
     var creative: VastLinearCreative
     let vastAd: VastAd
@@ -15,26 +19,22 @@ struct TrackingCreative {
     let midpoint: Double
     let thirdQuartile: Double
     let duration: Double
-    var trackedStart = false
     var trackedFirstQuartile = false
     var trackedMidpoint = false
     var trackedThirdQuartile = false
-    var trackedComplete = false
 }
 
 extension TrackingCreative {
-    init(creative: VastLinearCreative, vastAd: VastAd) {
+    init(creative: VastLinearCreative, vastAd: VastAd) throws {
+        guard let duration = creative.duration else {
+            throw TrackingCreativeError.noDurationInVastLinearCreative
+        }
+        
         self.creative = creative
         self.vastAd = vastAd
-        self.duration = creative.duration
+        self.duration = duration
         self.firstQuartile = ceil(duration * 0.25)
         self.midpoint = ceil(duration * 0.5)
         self.thirdQuartile = ceil(duration * 0.75)
-    }
-
-    func callTrackingUrls(_ urls: [URL]) {
-        urls.forEach { url in
-            makeRequest(withUrl: url)
-        }
     }
 }
